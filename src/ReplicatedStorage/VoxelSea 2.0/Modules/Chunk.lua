@@ -266,7 +266,7 @@ function Chunk.GetChunkAndVoxelIndexFromVector3(vectorPos : Vector3) : ( {} | ni
 		return
 	end
 
-	local index = Voxel.GetIndex(CFrame.new(voxel_pos):GetComponents())
+	local index = Voxel.GetIndex(utility.World_To_Relative(chunk:GetInitCorner(), CFrame.new(voxel_pos):GetComponents()))
 	return chunk, index
 end
 
