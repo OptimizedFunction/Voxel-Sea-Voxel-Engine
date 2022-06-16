@@ -181,8 +181,6 @@ if isServer then
 		update_log[pos] = update_log[pos] or {}
 		update_log[pos][index] = new_ID
 	end
-	
-	http_service = game:GetService("HttpService")
-end 
+end
 
 return replicator
