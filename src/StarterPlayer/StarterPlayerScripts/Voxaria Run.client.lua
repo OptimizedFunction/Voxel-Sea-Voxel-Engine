@@ -6,13 +6,15 @@ local Voxel = require(modules.VoxelLib)
 local Chunk = require(modules.Chunk)
 local TS = require(modules.TaskScheduler)
 local configuration = require(modules.Configuration)
---local utility = require(game:GetService('ReplicatedStorage').MasterManager.Utility)
+
 replicator:InitialiseClient()
 
 local CS_inStuds = configuration.GetChunkSize() * configuration.GetVoxelSize()
 local VCS_inStuds = configuration.GetVertChunkSize() * configuration.GetVoxelSize()
 
 local init_render_dist = 7
+local ReplicatedFirst = game:GetService('ReplicatedFirst')
+local run_service = game:GetService("RunService")
 
 local max_render_dist_txtBox : TextBox = game:GetService('Players').LocalPlayer:WaitForChild('PlayerGui'):WaitForChild('Misc'):WaitForChild('RenderDistanceLabel'):WaitForChild('RenderDistanceInput')
 local max_render_dist : number =  tonumber(max_render_dist_txtBox.Text) or 7
@@ -76,8 +78,7 @@ for _, chunk in pairs(Chunk.Load(init_chunks)) do
     chunk:Render(scheduler, true)
 end
 
-
-local event = game:GetService('ReplicatedFirst').LoadedEvent
+local event = ReplicatedFirst.LoadedEvent
 event:Fire()
 
 
@@ -145,7 +146,7 @@ function unloading_loop(originChunkPos : Vector3)
                         chunk:RemoveFromView()
                         if (Vector3.new(x,y,z) - originChunkPos).Magnitude > (max_render_dist + 2) * math.sqrt(2) * CS_inStuds then
                             chunk:Unload()
-                            game:GetService("RunService").Heartbeat:Wait()
+                            run_service.Heartbeat:Wait()
                         end
                     end
                 end

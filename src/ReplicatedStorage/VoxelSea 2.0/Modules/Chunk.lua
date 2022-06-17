@@ -112,7 +112,6 @@ function Chunk.Load(chunkPositions : {Vector3})
 	end
 
 
-
 	return newChunks
 end
 
@@ -342,7 +341,6 @@ end
 
 function Chunk:CompactAndRender()
 	--greedy meshing function.
-
 	local init_corner : Vector3 = self:GetInitCorner()
 	local initial_voxel_found = false
 	local voxels = self.Voxels
@@ -358,7 +356,6 @@ function Chunk:CompactAndRender()
 		-- finding eligible initial voxel
 		initial_voxel_found = false
 		local init_i : number, init_j : number, init_k : number
-		local init_index : number
 		local init_mat : number = 0
 
 		for index, voxel in pairs(voxels) do
@@ -444,7 +441,6 @@ function Chunk:CompactAndRender()
 				end
 			end
 		end
-
 	end
 
 	self:_ClearParts()
@@ -457,166 +453,6 @@ function Chunk:CompactAndRender()
 	self._IsUpdating = false
 end
 
-
-function Chunk:FilterInternalVoxels() --  Good when number of air voxels are more.
-
-	self._IsUpdating = true
-
-	local init_corner = self:GetInitCorner()
-	local voxels = self.Voxels
-
-	for i = 1, chunk_size do
-		for j = 1, vert_chunk_size do
-			for k = 1, chunk_size do
-
-				local index = Voxel.GetIndex(i, j, k)
-				local voxel = voxels[index]
-				if Voxel.GetMaterial(voxel) == 0 then
-					continue
-				else
-					local should_be_active = false
-
-					for a =  -1, 1, 2 do
-						local voxel_pos = Vector3.new(utility.Relative_To_World(init_corner, i+a, j, k))
-						local chunk = self
-
-						if i+a < 1 or i+a > chunk_size then
-							should_be_active = true
-							break
-						end
-
-						local neighbor_voxel_index = Voxel.GetIndex(utility.World_To_Relative(chunk:GetInitCorner(), voxel_pos.X, voxel_pos.Y, voxel_pos.Z) )
-						local neighbor_voxel = chunk.Voxels[neighbor_voxel_index]
-						if Voxel.GetMaterial(neighbor_voxel) ~= 0 then
-							continue
-						else
-							should_be_active = true
-							break
-						end
-					end
-
-					for b = -1, 1, 2 do
-						local voxel_pos = Vector3.new(utility.Relative_To_World(init_corner, i, j+b, k))
-						local chunk = self
-
-
-						if j+b < 1 or j+b > vert_chunk_size then
-							should_be_active = true
-							break
-						end
-
-						local neighbor_voxel_index = Voxel.GetIndex(utility.World_To_Relative(chunk:GetInitCorner(), voxel_pos.X, voxel_pos.Y, voxel_pos.Z))
-						local neighbor_voxel = chunk.Voxels[neighbor_voxel_index]
-						if Voxel.GetMaterial(neighbor_voxel) ~= 0 then
-							continue
-						else
-							should_be_active = true
-							break
-						end
-					end
-
-					for c = -1, 1, 2 do
-						local voxel_pos = Vector3.new(utility.Relative_To_World(init_corner, i, j, k+c))
-						local chunk = self
-
-						if k+c < 1 or k+c > chunk_size then
-							should_be_active = true
-							break
-						end
-
-						local neighbor_voxel_index = Voxel.GetIndex(utility.World_To_Relative(chunk:GetInitCorner(), voxel_pos.X, voxel_pos.Y, voxel_pos.Z))
-						local neighbor_voxel = chunk.Voxels[neighbor_voxel_index]
-						if Voxel.GetMaterial(neighbor_voxel) ~= 0 then
-							continue
-						else
-							should_be_active = true
-							break
-						end
-					end
-
-					if not should_be_active then
-						voxels[index] = Voxel.GetUpdatedID(voxel, false)
-					end
-
-				end
-			end
-		end
-	end
-end
-
-function Chunk:FilterInternalVoxels2() -- good when number of non-air voxels is high.
-
-	self:ResetVoxelStateToInactive()
-	self._IsUpdating = true
-
-	local init_corner = self:GetInitCorner()
-	local voxels = self.Voxels
-
-	for i = 1, chunk_size do
-		for j = 1, vert_chunk_size do
-			for k = 1, chunk_size do
-
-				local index = Voxel.GetIndex(i, j, k)
-				local voxel = voxels[index]
-
-				if (i == 1 or i == chunk_size or j == 1 or j == chunk_size or k == 1 or k == chunk_size) and Voxel.GetMaterial(voxel) ~= 0 then
-					voxels[index] = Voxel.GetUpdatedID(voxel, true)
-
-				elseif Voxel.GetMaterial(voxel) ~= 0 then
-					continue
-
-				else
-					for a =  -1, 1, 2 do
-						local voxel_pos = Vector3.new(utility.Relative_To_World(init_corner, i+a, j, k))
-						local chunk = self
-
-						if i+a < 1 or i+a > chunk_size then
-							continue
-						end
-
-						local neighbor_voxel_index = Voxel.GetIndex(utility.World_To_Relative(chunk:GetInitCorner(), voxel_pos.X, voxel_pos.Y, voxel_pos.Z) )
-						local neighbor_voxel = chunk.Voxels[neighbor_voxel_index]
-						if Voxel.GetMaterial(neighbor_voxel) ~= 0 then
-							chunk.Voxels[neighbor_voxel_index] = Voxel.GetUpdatedID(neighbor_voxel, true)
-						end
-					end
-
-					for b = -1, 1, 2 do
-						local voxel_pos = Vector3.new(utility.Relative_To_World(init_corner, i, j+b, k))
-						local chunk = self
-
-						if j+b < 1 or j+b > chunk_size then
-							continue
-						end
-
-						local neighbor_voxel_index = Voxel.GetIndex(utility.World_To_Relative(chunk:GetInitCorner(), voxel_pos.X, voxel_pos.Y, voxel_pos.Z) )
-						local neighbor_voxel = chunk.Voxels[neighbor_voxel_index]
-						if Voxel.GetMaterial(neighbor_voxel) ~= 0 then
-							chunk.Voxels[neighbor_voxel_index] = Voxel.GetUpdatedID(neighbor_voxel, true)
-						end
-					end
-					for c = -1, 1, 2 do
-						local voxel_pos = Vector3.new(utility.Relative_To_World(init_corner, i, j, k+c))
-						local chunk = self
-
-						if k+c < 1 or k+c > chunk_size then
-							continue
-						end
-
-						local neighbor_voxel_index = Voxel.GetIndex(utility.World_To_Relative(chunk:GetInitCorner(), voxel_pos.X, voxel_pos.Y, voxel_pos.Z) )
-						local neighbor_voxel = chunk.Voxels[neighbor_voxel_index]
-						if Voxel.GetMaterial(neighbor_voxel) ~= 0 then
-							chunk.Voxels[neighbor_voxel_index] = Voxel.GetUpdatedID(neighbor_voxel, true)
-						end
-					end
-
-				end
-			end
-		end
-	end
-end
-
-
 function Chunk:Render(scheduler, shouldYield : boolean?) -- Renders chunk. shouldYield param is optional. Defines if the
 															  -- lua thread which called this method be yielded or not.
 	if not scheduler then error('Scheduler object is required to render chunk.') end
@@ -625,7 +461,7 @@ end
 
 function Chunk:Update()
 	coroutine.wrap(function()
-		repeat game:GetService('RunService').RenderStepped:Wait()
+		repeat game:GetService('RunService').Heartbeat:Wait()
 		until not self._IsUpdating
 		self:CompactAndRender()
 	end)()
