@@ -20,7 +20,7 @@ function poolService.AddPart(part : Part)
     
     if part.Parent ~= nil then
         table.insert(PartPool, part)
-        part.CFrame = CFrame.new(0, 10e8, 0)
+        part.CFrame = CFrame.new(0, math.huge, 0)
     else
         return
     end

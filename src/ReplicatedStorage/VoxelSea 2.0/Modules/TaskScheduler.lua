@@ -1,5 +1,5 @@
 --!nocheck
-
+local run_service = game:GetService("RunService")
 local lastIteration, start
 local frameUpdateTable = {}
 
@@ -83,7 +83,7 @@ function TaskScheduler:CreateScheduler(targetFps)
 					break
 				end
 			else
-				game:GetService("RunService").Heartbeat:Wait()
+				run_service.Heartbeat:Wait()
 			end
 		end
 	end
@@ -164,7 +164,7 @@ end
 
 
 start = tick()
-game:GetService("RunService").Heartbeat:Connect(function()
+run_service.Heartbeat:Connect(function()
 	lastIteration = tick()
 	
 	for i=#frameUpdateTable,1,-1 do
@@ -173,6 +173,6 @@ game:GetService("RunService").Heartbeat:Connect(function()
 	
 	frameUpdateTable[1] = lastIteration
 end)
-game:GetService("RunService").Heartbeat:Wait()--prevent tick()-start from being 0
+run_service.Heartbeat:Wait()--prevent tick()-start from being 0
 
 return TaskScheduler
