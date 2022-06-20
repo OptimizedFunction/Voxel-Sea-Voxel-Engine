@@ -57,7 +57,7 @@ function chunk_manager.UpdateChunkWithTerrainData(chunk)
         local scale = 0.65
         local octaves = 4
         local frequency = 600
-        local amplitude = vert_chunk_size * 2/3
+        local amplitude = vert_chunk_size * 3/4
         local persistence = 0.35
         local lacunarity = 2
 

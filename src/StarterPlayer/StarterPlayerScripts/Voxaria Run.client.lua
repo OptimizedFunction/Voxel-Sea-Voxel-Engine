@@ -4,10 +4,12 @@ local modules = require(game:GetService('ReplicatedStorage')["VoxelSea 2.0"].Mod
 local replicator = require(modules.ReplicatorAndUpdateLogger)
 local Voxel = require(modules.VoxelLib)
 local Chunk = require(modules.Chunk)
+local ChunkManager = require(modules.ChunkManager)
 local TS = require(modules.TaskScheduler)
 local configuration = require(modules.Configuration)
 
 replicator:InitialiseClient()
+Chunk.SetLoadDataCallback(ChunkManager.UpdateChunkWithTerrainData)
 
 local CS_inStuds = configuration.GetChunkSize() * configuration.GetVoxelSize()
 local VCS_inStuds = configuration.GetVertChunkSize() * configuration.GetVoxelSize()

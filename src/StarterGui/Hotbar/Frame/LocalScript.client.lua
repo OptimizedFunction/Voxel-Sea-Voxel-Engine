@@ -9,17 +9,18 @@ local buttons = {
 
 function updateMat(action, inputState, inputObj)
 	if inputState == Enum.UserInputState.End then return end
-	
+
 	local i = table.find(buttons, script.Parent[action])
-	
+
 	local current_mat : IntValue = script.Parent.Parent.CurrentMat
-	
+
 	if buttons[current_mat.Value] then
-		buttons[current_mat.Value].BorderColor3 = Color3.fromRGB(156,156,156)
+		buttons[current_mat.Value].UIStroke.Color = Color3.fromRGB(0,0,0)
+		buttons[current_mat.Value].UIStroke.Thickness = 1
 	end
-	
+
 	current_mat.Value = i
-	buttons[i].BorderColor3 = Color3.fromRGB(0,0,255)
+	buttons[i].UIStroke.Thickness = 2.5
 
 end
 
@@ -28,10 +29,11 @@ for i = 1, #buttons do
 	buttons[i].MouseButton1Click:Connect(function()
 		local current_mat : IntValue = script.Parent.Parent.CurrentMat
 		if buttons[current_mat.Value] then
-			buttons[current_mat.Value].BorderColor3 = Color3.fromRGB(156,156,156)
+			buttons[current_mat.Value].UIStroke.Color = Color3.fromRGB(0,0,0)
+			buttons[current_mat.Value].UIStroke.Thickness = 1
 		end
 		current_mat.Value = i
-		buttons[i].BorderColor3 = Color3.fromRGB(0,0,255)
+		buttons[i].UIStroke.Thickness = 2.5
 	end)
 end
 
