@@ -5,17 +5,25 @@ game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
 local open = false
 
 script.Parent.MouseButton1Click:Connect(function()
-	local unstuck = script.Parent.Parent.unstuck
-	local render_Dist_label = script.Parent.Parent.RenderDistanceLabel
+	local unstuck = script.Parent.Parent.Parent.unstuck
+	local render_Dist_label = script.Parent.Parent.Parent.RenderDistanceLabel
 
 	if not open then
-		script.Parent.Text = 'Back [Tab]'
 
-		unstuck.Active = true
-		unstuck.Visible = true
-
-		render_Dist_label.Visible = true
-		render_Dist_label.RenderDistanceInput.Active = true
+		unstuck:TweenPosition(
+			UDim2.fromScale(0.5,0.55),
+			Enum.EasingDirection.In,
+			Enum.EasingStyle.Back,
+			0.5,
+			true
+		)
+		render_Dist_label:TweenPosition(
+			UDim2.fromScale(0.5,0.415),
+			Enum.EasingDirection.In,
+			Enum.EasingStyle.Back,
+			0.5,
+			true
+		)
 
 		open = true
 
@@ -23,13 +31,22 @@ script.Parent.MouseButton1Click:Connect(function()
 	end
 
 	if open then
-		script.Parent.Text = 'Settings [Tab]'
 
-		unstuck.Active = false
-		unstuck.Visible = false
+		unstuck:TweenPosition(
+			UDim2.fromScale(0.5,-1),
+			Enum.EasingDirection.In,
+			Enum.EasingStyle.Back,
+			0.5,
+			true
+		)
 
-		render_Dist_label.Visible = false
-		render_Dist_label.RenderDistanceInput.Active = false
+		render_Dist_label:TweenPosition(
+			UDim2.fromScale(0.5,-1.135),
+			Enum.EasingDirection.In,
+			Enum.EasingStyle.Back,
+			0.5,
+			true
+		)
 
 		open = false
 
@@ -43,17 +60,25 @@ local CAS = game:GetService('ContextActionService')
 function handler(_, input_state, _)
 	if input_state == Enum.UserInputState.End then return end
 
-	local unstuck = script.Parent.Parent.unstuck
-	local render_Dist_label = script.Parent.Parent.RenderDistanceLabel
+	local unstuck = script.Parent.Parent.Parent.unstuck
+	local render_Dist_label = script.Parent.Parent.Parent.RenderDistanceLabel
 
 	if not open then
-		script.Parent.Text = 'Back [Tab]'
 
-		unstuck.Active = true
-		unstuck.Visible = true
-
-		render_Dist_label.Visible = true
-		render_Dist_label.RenderDistanceInput.Active = true
+		unstuck:TweenPosition(
+			UDim2.fromScale(0.5,0.55),
+			Enum.EasingDirection.Out,
+			Enum.EasingStyle.Quad,
+			q,
+			true
+		)
+		render_Dist_label:TweenPosition(
+			UDim2.fromScale(0.5,0.415),
+			Enum.EasingDirection.Out,
+			Enum.EasingStyle.Quad,
+			q,
+			true
+		)
 
 		open = true
 
@@ -61,16 +86,25 @@ function handler(_, input_state, _)
 	end
 
 	if open then
-		script.Parent.Text = 'Settings [Tab]'
 
-		unstuck.Active = false
-		unstuck.Visible = false
+		unstuck:TweenPosition(
+			UDim2.fromScale(0.5,-1),
+			Enum.EasingDirection.In,
+			Enum.EasingStyle.Back,
+			1,
+			true
+		)
 
-		render_Dist_label.Visible = false
-		render_Dist_label.RenderDistanceInput.Active = false
+		render_Dist_label:TweenPosition(
+			UDim2.fromScale(0.5,-1.135),
+			Enum.EasingDirection.In,
+			Enum.EasingStyle.Back,
+			1,
+			true
+		)
 
 		open = false
-		
+
 		return
 	end
 end

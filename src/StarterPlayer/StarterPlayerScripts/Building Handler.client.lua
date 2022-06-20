@@ -25,10 +25,8 @@ local buildingCooldown : boolean = false
 
 local function main_handler(action, input_state)
 
-	if input_state == Enum.UserInputState.Begin then
-		break_loop = false
-	elseif input_state == Enum.UserInputState.End then
-		break_loop = true
+	break_loop = true
+	if input_state == Enum.UserInputState.End then
 		return
 	end
 
@@ -36,6 +34,7 @@ local function main_handler(action, input_state)
 	buildingCooldown = true
 
 	if action == 'Destroy' then
+		break_loop = false
 		repeat
 			local chunk, index = Chunk.GetChunkAndVoxelIndexFromVector3(currentPos)
 			local old_ID = chunk.Voxels[index]
@@ -48,13 +47,7 @@ local function main_handler(action, input_state)
 		until break_loop
 		
 	elseif action == 'Build' then
-		if input_state == Enum.UserInputState.Begin then
-			break_loop = false
-		elseif input_state == Enum.UserInputState.End then
-			break_loop = true
-			return
-		end
-
+		break_loop = false
 		local current_mat = plr.PlayerGui.Hotbar.CurrentMat.Value
 		if current_mat == 0 then break_loop = true; buildingCooldown = false; return end
 
@@ -179,7 +172,7 @@ RunService:BindToRenderStep(
 				end
 			end
 
-
+			
 			local pos_x = voxel_size * (math.floor(x/voxel_size + 0.5) + getSign(x, 1, voxel_size)*1/2)
 			local pos_y =  voxel_size * (math.floor(y/voxel_size + 0.5) + getSign(y, 1, voxel_size)*1/2)
 			local pos_z = voxel_size * (math.floor(z/voxel_size + 0.5) + getSign(z, 1, voxel_size)*1/2)
