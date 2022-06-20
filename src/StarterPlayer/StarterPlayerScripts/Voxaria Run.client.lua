@@ -14,12 +14,12 @@ Chunk.SetLoadDataCallback(ChunkManager.UpdateChunkWithTerrainData)
 local CS_inStuds = configuration.GetChunkSize() * configuration.GetVoxelSize()
 local VCS_inStuds = configuration.GetVertChunkSize() * configuration.GetVoxelSize()
 
-local init_render_dist = 4
+local init_render_dist = 15
 local ReplicatedFirst = game:GetService('ReplicatedFirst')
 local run_service = game:GetService("RunService")
 
 local max_render_dist_txtBox : TextBox = game:GetService('Players').LocalPlayer:WaitForChild('PlayerGui'):WaitForChild('Misc'):WaitForChild('RenderDistanceLabel'):WaitForChild('RenderDistanceInput')
-local max_render_dist : number =  tonumber(max_render_dist_txtBox.Text) or 4
+local max_render_dist : number =  tonumber(max_render_dist_txtBox.Text) or 7
 
 
 local scheduler = TS:CreateScheduler(35)
