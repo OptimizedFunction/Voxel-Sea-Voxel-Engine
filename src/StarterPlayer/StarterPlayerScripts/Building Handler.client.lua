@@ -37,7 +37,7 @@ local function main_handler(action, input_state)
 		break_loop = false
 		repeat
 			local chunk, index = Chunk.GetChunkAndVoxelIndexFromVector3(currentPos)
-			if not chunk then warn("Chunk not found!"); continue; end
+			if not chunk then warn("Chunk not found!"); break; end
 
 			local old_ID = chunk.Voxels[index]
 			chunk.Voxels[index] = Voxel.GetUpdatedID(chunk.Voxels[index], false, 0)

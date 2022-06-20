@@ -69,14 +69,14 @@ function handler(_, input_state, _)
 			UDim2.fromScale(0.5,0.55),
 			Enum.EasingDirection.Out,
 			Enum.EasingStyle.Quad,
-			q,
+			1,
 			true
 		)
 		render_Dist_label:TweenPosition(
 			UDim2.fromScale(0.5,0.415),
 			Enum.EasingDirection.Out,
 			Enum.EasingStyle.Quad,
-			q,
+			1,
 			true
 		)
 
