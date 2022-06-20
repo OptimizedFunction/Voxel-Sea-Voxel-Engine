@@ -11,32 +11,32 @@ local DS = DS_service:GetDataStore('WorldSaves')
 local max_retry_count : number = script:GetAttribute('max_retry_count')
 local retries = 0
 
-function data_manager.SaveWorld(plr : Player, update_log : {})
-	assert(plr:IsA('Player'), '[VOXARIA][Data Manager]: Argument #1 to SaveWorld() must be a player object!')
-	assert(type(update_log) == 'table', '[VOXARIA][Data Manager]: Argument #3 to SaveWorld() must be a list!')
+function data_manager.SaveWorld(update_log : {})
+	--assert(plr:IsA('Player'), '[VOXARIA][Data Manager]: Argument #1 to SaveWorld() must be a player object!')
+	--assert(type(update_log) == 'table', '[VOXARIA][Data Manager]: Argument #2 to SaveWorld() must be a list!')
 	
 	local encoded_update_log = encodeUpdates(update_log)
 	
 	local function save()
-		local old_save = DS:GetAsync(plr.PlayerId)
+		--local old_save = DS:GetAsync(plr.PlayerId)
+		local old_save = DS:GetAsync("12345")
 
 		local data_table = {
 			['updateLog'] = encoded_update_log;
 		}
 
 		if not old_save then
-			DS:SetAsync(plr.PlayerId, data_table)
+			--DS:SetAsync(plr.PlayerId, data_table)
+			DS:SetAsync("12345", data_table)
 		elseif old_save then
 			
 			local function update_data(old_data)
 				old_data['updateLog'] = encoded_update_log
-				if #encoded_update_log < old_data['updateLog'] then 
-					error('New save is possibly corrupted!') 
-				end
 				return old_data
 			end
 			
-			DS:UpdateAsync(plr.PlayerId, data_table, update_data)
+			--DS:UpdateAsync(plr.UserId, update_data)
+			DS:UpdateAsync("12345", update_data)
 		end
 	end
 	
@@ -47,7 +47,8 @@ function data_manager.SaveWorld(plr : Player, update_log : {})
 	elseif not success then
 		if retries < max_retry_count then
 			retries += 1
-			data_manager.SaveWorld(plr, update_log)
+			--data_manager.SaveWorld(plr, update_log)
+			data_manager.SaveWorld("12345", update_log)
 		else
 			retries = 0
 			return false, err
@@ -55,30 +56,25 @@ function data_manager.SaveWorld(plr : Player, update_log : {})
 	end
 end
 
-function data_manager.GetWorldSave(plr : Player) : ({} | nil)
-	assert(plr:IsA('Player'), '[VOXARIA][Data Manager]: Argument #1 to GetWorldSave() must be a player object!')
-	
+function data_manager.GetWorldSave() : ({} | nil)
+	--assert(plr:IsA('Player'), '[VOXARIA][Data Manager]: Argument #1 to GetWorldSave() must be a player object!')
+
 	local function load()
-		local save = DS:GetAsync(plr.PlayerId)
+		--local save = DS:GetAsync(plr.PlayerId)
+		local save = DS:GetAsync("12345")
 		if save then
 			return decodeUpdates(save['updateLog'])
-		else 
-			return nil
+		else
+			return {}
 		end
 	end
 	
 	local success, err = pcall(load)
 	
-	if success then 
-		return true, nil
+	if success then
+		return err
 	elseif not success then
-		if retries < max_retry_count then
-			retries += 1
-			data_manager.GetWorldSave(plr)
-		else
-			retries = 0
-			return false, err
-		end
+		error(err)
 	end
 	
 end
@@ -131,11 +127,11 @@ function decodeUpdates(encoded_string : string) : {}
 		decoded_log[pos] = table.create(chunk_size^2 * vert_chunk_size)
 		local decoded_log_part = decoded_log[pos]
 
-		for i,v in encoded_log_part do
+		for _,v in encoded_log_part do
 			if type(v) == "number" then
 				decoded_log_part[#decoded_log_part+1] = v
 			else
-				for j = 1, v[1] do
+				for _ = 1, v[1] do
 					decoded_log_part[#decoded_log_part+1] = v[2]
 				end
 			end

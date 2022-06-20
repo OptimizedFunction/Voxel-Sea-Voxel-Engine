@@ -98,15 +98,15 @@ end
 
 --server-only 
 if isServer then
-	
+
 	local update_log = {}
-	
+
 	local conn1 : RBXScriptConnection 
 	--initialises the engine on the server.
 	function replicator.InitialiseServer()
-		
+
 		--Connections/remote function callback assignments
-		
+
 		--Update log loading connection
 		script.Parent.Parent.Remotes.RemoteFunctions:WaitForChild('update').OnServerInvoke = function(_, chunkPositions : {})
 			local updates_to_return = {}
@@ -174,13 +174,23 @@ if isServer then
 			end
 		end
 	end
-	
+
 	--Function to log updates to chunks.
 	function LogUpdate(chunk, index : number, new_ID : number)
 		local pos = chunk.Position
 		update_log[pos] = update_log[pos] or {}
 		update_log[pos][index] = new_ID
 	end
+
+	function replicator.GetUpdateLog()
+		return update_log
+	end
+
+	function replicator.SetUpdateLog(newLog : {})
+		assert(typeof(newLog) == "table", "Argument #1 must be a table! Type of arg 1: "..typeof(newLog))
+		update_log = newLog
+	end
+
 end
 
 return replicator
