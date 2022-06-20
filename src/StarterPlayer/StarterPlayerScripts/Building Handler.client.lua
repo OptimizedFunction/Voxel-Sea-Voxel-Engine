@@ -37,8 +37,9 @@ local function main_handler(action, input_state)
 		break_loop = false
 		repeat
 			local chunk, index = Chunk.GetChunkAndVoxelIndexFromVector3(currentPos)
-			local old_ID = chunk.Voxels[index]
+			if not chunk then warn("Chunk not found!"); continue; end
 
+			local old_ID = chunk.Voxels[index]
 			chunk.Voxels[index] = Voxel.GetUpdatedID(chunk.Voxels[index], false, 0)
 			chunk:Update()
 			replicator.RequestReplication({{chunk, index, old_ID, chunk.Voxels[index]}})
