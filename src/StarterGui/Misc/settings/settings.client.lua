@@ -5,8 +5,8 @@ game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
 local open = false
 
 script.Parent.MouseButton1Click:Connect(function()
-	local unstuck = script.Parent.Parent.Parent.unstuck
-	local render_Dist_label = script.Parent.Parent.Parent.RenderDistanceLabel
+	local unstuck = script.Parent.Parent.unstuck
+	local render_Dist_label = script.Parent.Parent.RenderDistanceLabel
 
 	if not open then
 
@@ -14,14 +14,14 @@ script.Parent.MouseButton1Click:Connect(function()
 			UDim2.fromScale(0.5,0.55),
 			Enum.EasingDirection.In,
 			Enum.EasingStyle.Back,
-			0.5,
+			1,
 			true
 		)
 		render_Dist_label:TweenPosition(
 			UDim2.fromScale(0.5,0.415),
 			Enum.EasingDirection.In,
 			Enum.EasingStyle.Back,
-			0.5,
+			1,
 			true
 		)
 
@@ -36,7 +36,7 @@ script.Parent.MouseButton1Click:Connect(function()
 			UDim2.fromScale(0.5,-1),
 			Enum.EasingDirection.In,
 			Enum.EasingStyle.Back,
-			0.5,
+			1,
 			true
 		)
 
@@ -44,7 +44,7 @@ script.Parent.MouseButton1Click:Connect(function()
 			UDim2.fromScale(0.5,-1.135),
 			Enum.EasingDirection.In,
 			Enum.EasingStyle.Back,
-			0.5,
+			1,
 			true
 		)
 
@@ -60,8 +60,8 @@ local CAS = game:GetService('ContextActionService')
 function handler(_, input_state, _)
 	if input_state == Enum.UserInputState.End then return end
 
-	local unstuck = script.Parent.Parent.Parent.unstuck
-	local render_Dist_label = script.Parent.Parent.Parent.RenderDistanceLabel
+	local unstuck = script.Parent.Parent.unstuck
+	local render_Dist_label = script.Parent.Parent.RenderDistanceLabel
 
 	if not open then
 

@@ -14,7 +14,7 @@ Chunk.SetLoadDataCallback(ChunkManager.UpdateChunkWithTerrainData)
 local CS_inStuds = configuration.GetChunkSize() * configuration.GetVoxelSize()
 local VCS_inStuds = configuration.GetVertChunkSize() * configuration.GetVoxelSize()
 
-local init_render_dist = 7
+local init_render_dist = 15
 local ReplicatedFirst = game:GetService('ReplicatedFirst')
 local run_service = game:GetService("RunService")
 
