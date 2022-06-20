@@ -69,14 +69,15 @@ if isClient then
 			
 			local chunk = update[1]
 			local index = update[2]
+			local old_ID = update[3]
 			local new_ID = update[4]
 			
 			--finds the chunk from position
 			local local_chunk = require(modules.Chunk).GetChunkFromPos(chunk.Position)
 			
 			if local_chunk then
-				local_chunk.Voxels[index] = new_ID
-				if not table.find(to_be_updated_chunks, local_chunk) then 
+				local_chunk.Voxels[index] = if plrRequestingUpdate then new_ID else old_ID
+				if not table.find(to_be_updated_chunks, local_chunk) then
 					table.insert(to_be_updated_chunks, local_chunk)
 				end
 			end
@@ -85,6 +86,7 @@ if isClient then
 		
 		for _,chunk in pairs(to_be_updated_chunks) do
 			chunk:Update()
+			print(chunk.Position)
 		end
 	end
 
@@ -145,7 +147,7 @@ if isServer then
 			
 			setmetatable(chunk, require(modules.Chunk))
 			
-			local range = 10 * configuration.GetVoxelSize()
+			local range = 20 * configuration.GetVoxelSize()
 			
 			local remotes = script.Parent.Parent.Remotes
 			local building = remotes.RemoteEvents.building
@@ -156,20 +158,21 @@ if isServer then
 			local voxel_pos = Vector3.new(x,y,z)
 
 			if not plrRequestingUpdate.Character or not plrRequestingUpdate.Character.PrimaryPart then continue end
-			
-			
+
+
 			if (voxel_pos - plrRequestingUpdate.Character.PrimaryPart.Position).Magnitude <= range then
 				table.insert(approved_updates, update)
 				LogUpdate(chunk, index, new_ID)
 			else
 				table.insert(rejected_updates, update)
 			end
-			
+
 			if #approved_updates > 0 then
 				building:FireAllClients(plrRequestingUpdate, approved_updates)
 			end
-			
+
 			if #rejected_updates > 0 then
+				print("reverting changes!")
 				building:FireClient(plrRequestingUpdate, nil, rejected_updates)
 			end
 		end
