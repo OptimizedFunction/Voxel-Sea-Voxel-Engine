@@ -14,7 +14,7 @@ Chunk.SetLoadDataCallback(ChunkManager.UpdateChunkWithTerrainData)
 local CS_inStuds = configuration.GetChunkSize() * configuration.GetVoxelSize()
 local VCS_inStuds = configuration.GetVertChunkSize() * configuration.GetVoxelSize()
 
-local init_render_dist = 15
+local init_render_dist = 7
 local ReplicatedFirst = game:GetService('ReplicatedFirst')
 local run_service = game:GetService("RunService")
 
@@ -55,7 +55,6 @@ for a = -init_render_dist, init_render_dist-1 do
 
         local centerPos = Vector3.new(1,1,1) * configuration.GetVoxelSize() * math.pi/100
         local originChunkPos = Chunk.GetChunkPosFromVoxelPos(Voxel.GetNearestVoxelPos(centerPos))
-
         local pos = originChunkPos + (Vector3.new(a,0,b) + Vector3.new(1/2,0,1/2)) * CS_inStuds
 
         if not Chunk.GetChunkFromPos(pos) then
@@ -93,17 +92,22 @@ plr.CameraMaxZoomDistance = 1000
 
 local chunks_in_range = {}
 local chunks_to_load = {}
+local break_loop = false
+max_render_dist_txtBox:GetPropertyChangedSignal('Text'):Connect(function() break_loop = true end)
 function render_loop(originChunkPos : Vector3)
 
+    break_loop = false
     scheduler:ClearQueue()
 
     chunks_in_range = {}
     chunks_to_load = {}
 
     for max_length = 1, max_render_dist do
+        if break_loop then break end
         for direction = 1, -1, -2 do
-
-            for current_i = -max_length, max_length-1 do
+            if break_loop then break end
+            for current_i = 1-max_length, max_length-1 do
+                if break_loop then break end
                 local current_x = direction * current_i * CS_inStuds + originChunkPos.X
                 local current_y = VCS_inStuds/2
                 local current_z = direction * (max_length - 1) * CS_inStuds + originChunkPos.Z
@@ -116,7 +120,8 @@ function render_loop(originChunkPos : Vector3)
                 end
             end
 
-            for current_k = -max_length, max_length-1 do
+            for current_k = 1-max_length, max_length-1 do
+                if break_loop then break end
                 local current_x = direction * (max_length - 1) * CS_inStuds + originChunkPos.X
                 local current_y = VCS_inStuds/2
                 local current_z = -direction * current_k * CS_inStuds + originChunkPos.Z
@@ -135,6 +140,7 @@ function render_loop(originChunkPos : Vector3)
 
 
     for _, chunkPos in pairs(chunks_to_load) do
+        if break_loop then break end
         Chunk.LoadAndRender(chunkPos, scheduler)
     end
 end
@@ -158,6 +164,7 @@ function unloading_loop(originChunkPos : Vector3)
 end
 
 local oldOriginChunkPos : Vector3
+local old_max_render_dist = init_render_dist
 
 while true do
     local char = plr.Character or plr.CharacterAdded
@@ -166,12 +173,13 @@ while true do
     local ModifiedPrimaryPartPos : Vector3 = rootPart.Position + Vector3.new(1,1,1) * configuration.GetVoxelSize() * math.pi/100
     local originChunkPos : Vector3 = Chunk.GetChunkPosFromVoxelPos(Voxel.GetNearestVoxelPos(ModifiedPrimaryPartPos))
 
-    if oldOriginChunkPos and originChunkPos ~= oldOriginChunkPos then
-        task.spawn(unloading_loop, originChunkPos)
+    if (oldOriginChunkPos and originChunkPos ~= oldOriginChunkPos) or (max_render_dist ~= old_max_render_dist) then
         render_loop(originChunkPos)
+        unloading_loop(originChunkPos)
     end
 
     oldOriginChunkPos = originChunkPos
+    old_max_render_dist = max_render_dist
 
     task.wait(0.25)
 end

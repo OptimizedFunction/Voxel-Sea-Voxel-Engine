@@ -134,7 +134,7 @@ function TaskScheduler:CreateScheduler(targetFps)
 
 	function scheduler:QueueTaskAtPosition(callback, position : number, shouldYield : boolean | nil)
 		position = math.floor(position)
-		assert(position > 1, '[[Voxaria]][TaskScheduler:QueueTaskAtPosition] Argument #2 must be >= 1')
+		assert(position > 1, "[[Voxaria]][TaskScheduler:QueueTaskAtPosition] Argument #2 must be >= 1")
 		table.insert(queue, position, callback)
 		if sleeping and not paused then
 			sleeping = false

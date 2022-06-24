@@ -10,6 +10,7 @@ local modules = {
     ["TaskScheduler"] = script.Parent.TaskScheduler;
     ["Utility"] = script.Parent.Utility;
     ["VoxelLib"] = script.Parent.VoxelLib;
+    ["PrimitiveBlockState"] = script.Parent.Chunk.PrimitiveBlockState;
 
 }
 

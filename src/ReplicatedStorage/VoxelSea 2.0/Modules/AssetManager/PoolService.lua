@@ -1,5 +1,5 @@
 local PartPool = {}
-local TexturePool = script:WaitForChild('TexturePool')
+local TexturePool = script:WaitForChild("TexturePool")
 
 local modules = require(script.Parent.Parent.ModuleIndex)
 
@@ -16,7 +16,7 @@ local tempTextureLifetime : number = 30     --in seconds
 local poolService = {}
 
 function poolService.AddPart(part : Part)
-    assert(typeof(part) == 'Instance' and part:IsA('Part'), '[[Voxaria]][PoolService][.AddPart] Argument #1 must be a Part Instance.')
+    assert(typeof(part) == "Instance" and part:IsA("Part"), "[[Voxaria]][PoolService][.AddPart] Argument #1 must be a Part Instance.")
     
     if part.Parent ~= nil then
         table.insert(PartPool, part)
@@ -25,8 +25,8 @@ function poolService.AddPart(part : Part)
         return
     end
 
-    local matCode : number = part:GetAttribute('MaterialCode')
-    if not matCode then error('Material Code attribute does not exist for part '..part:GetFullName()) end
+    local matCode : number = part:GetAttribute("MaterialCode")
+    if not matCode then error("Material Code attribute does not exist for part "..part:GetFullName()) end
 
     local matName : string = assetManager.GetNameFromMaterialCode(matCode)
 
@@ -37,41 +37,41 @@ function poolService.AddPart(part : Part)
 
     local matFolder = TexturePool:FindFirstChild(matName)
     if not matFolder then
-        matFolder = Instance.new('Folder')
+        matFolder = Instance.new("Folder")
         matFolder.Name = matName
         matFolder.Parent = TexturePool
     end
 
-    local matFolderPartition = Instance.new('Folder', matFolder)
+    local matFolderPartition = Instance.new("Folder", matFolder)
     debrisCollector.AddItem(matFolderPartition, tempTextureLifetime)
 
     for _,child in pairs(part:GetChildren()) do
-        if child:IsA('Texture') then
+        if child:IsA("Texture") then
             child.Parent = matFolderPartition
         end
     end
 end
 
 function poolService.GetPart(position : Vector3, size : Vector3, matCode : number) : Part
-    assert(typeof(position) == 'Vector3', '[[Voxaria]][PoolService][.GetPart] Argument #1 must be a Vector3.')
-    assert(typeof(size) == 'Vector3', '[[Voxaria]][PoolService][.GetPart] Argument #2 must be a Vector3.')
-    assert(typeof(matCode) == 'number', '[[Voxaria]][PoolService][.GetPart] Argument #3 must be a number.')
+    assert(typeof(position) == "Vector3", "[[Voxaria]][PoolService][.GetPart] Argument #1 must be a Vector3.")
+    assert(typeof(size) == "Vector3", "[[Voxaria]][PoolService][.GetPart] Argument #2 must be a Vector3.")
+    assert(typeof(matCode) == "number", "[[Voxaria]][PoolService][.GetPart] Argument #3 must be a number.")
 
 
     local part : Part
     if #PartPool > 0 then
-		part = table.remove(PartPool, 1)
+		part = table.remove(PartPool, 1)::Part
        	debrisCollector.RemoveItem(part)
     else
-        part = Instance.new('Part')
-        part.Name = 'Compacted_Part'
+        part = Instance.new("Part")
+        part.Name = "Compacted_Part"
         part.Material = Enum.Material.Concrete
         part.Anchored = true
     end
 
     part.Position = position
     part.Size = size
-    part:SetAttribute('MaterialCode', matCode)
+    part:SetAttribute("MaterialCode", matCode)
     part.Parent = replicator.VoxariaObjectsFolder
 
     local matName : string = assetManager.GetNameFromMaterialCode(matCode)
@@ -83,7 +83,7 @@ function poolService.GetPart(position : Vector3, size : Vector3, matCode : numbe
             texture.Parent = part
         end
     else
-        local partitionFolder : Instance = matFolder:FindFirstChildOfClass('Folder')
+        local partitionFolder : Instance = matFolder:FindFirstChildOfClass("Folder")
         debrisCollector.RemoveItem(partitionFolder)
 
         for _, texture in pairs(partitionFolder:GetChildren()) do
@@ -97,23 +97,23 @@ end
 
 
 function poolService.AddTexturesToPool(part: Part)
-    assert(typeof(part) == 'Instance' and part:IsA('Part'), '[[Voxaria]][PoolService][.PoolTexturesFromPart] Argument #1 must be a Part Instance.')
+    assert(typeof(part) == "Instance" and part:IsA("Part"), "[[Voxaria]][PoolService][.PoolTexturesFromPart] Argument #1 must be a Part Instance.")
 
-    local matName : string = assetManager.GetNameFromMaterialCode(part:GetAttribute('MaterialCode'))
+    local matName : string = assetManager.GetNameFromMaterialCode(part:GetAttribute("MaterialCode"))
     
     local matFolder = TexturePool:FindFirstChild(matName)
     if not matFolder then
-        matFolder = Instance.new('Folder')
+        matFolder = Instance.new("Folder")
         matFolder.Name = matName
         matFolder.Parent = TexturePool
     end
 
-    local matFolderPartition = Instance.new('Folder', matFolder)
+    local matFolderPartition = Instance.new("Folder", matFolder)
     matFolderPartition.Name = #matFolder:GetChildren()
     debrisCollector.AddItem(matFolderPartition, tempTextureLifetime)
 
     for _,child in pairs(part:GetChildren()) do
-        if child:IsA('Texture') then
+        if child:IsA("Texture") then
             child.Parent = matFolderPartition
         end
     end
@@ -121,8 +121,8 @@ end
 
 
 function poolService.AddTexturesToPart(part : Part, matCode : number)
-    assert(typeof(part) == 'Instance' and part:IsA('Part'), '[[Voxaria]][PoolService][.AddTexturesToPart] Argument #1 must be a Part Instance.')
-    assert(typeof(matCode) == 'number', '[[Voxaria]][PoolService][.AddTexturesToPart] Argument #2 must be a number.')
+    assert(typeof(part) == "Instance" and part:IsA("Part"), "[[Voxaria]][PoolService][.AddTexturesToPart] Argument #1 must be a Part Instance.")
+    assert(typeof(matCode) == "number", "[[Voxaria]][PoolService][.AddTexturesToPart] Argument #2 must be a number.")
 
     local matName : string = assetManager.GetNameFromMaterialCode(matCode)
 
@@ -133,7 +133,7 @@ function poolService.AddTexturesToPart(part : Part, matCode : number)
             texture.Parent = part
         end
     else
-        local partitionFolder : Instance = matFolder:FindFirstChildOfClass('Folder')
+        local partitionFolder : Instance = matFolder:FindFirstChildOfClass("Folder")
         debrisCollector.RemoveItem(partitionFolder)
 
         for _, texture in pairs(partitionFolder:GetChildren()) do

@@ -19,7 +19,7 @@ local Voxel = require(modules.VoxelLib)
 local utility = require(modules.Utility)
 local configuration = require(modules.Configuration)
 
-replicator.VoxariaObjectsFolder = workspace:FindFirstChild('VoxariaObjects')
+replicator.VoxariaObjectsFolder = workspace:FindFirstChild("VoxariaObjects")
 
 
 replicator.RenderedChunkList = {}
@@ -35,8 +35,8 @@ if isClient then
 	-- Initialises the engine on the client.
     function replicator.InitialiseClient()
         if replicator.VoxariaObjectsFolder == nil then
-            local folder = Instance.new('Folder')
-            folder.Name = 'VoxariaObjects'
+            local folder = Instance.new("Folder")
+            folder.Name = "VoxariaObjects"
             folder.Parent = workspace
 			replicator.VoxariaObjectsFolder = folder
 		end
@@ -62,7 +62,7 @@ if isClient then
 	
 	--Processes the Updates requiring replication.
 	function ProcessUpdate(plrRequestingUpdate, updates)
-		if plrRequestingUpdate and game:GetService('Players').LocalPlayer == plrRequestingUpdate then return end
+		if plrRequestingUpdate and game:GetService("Players").LocalPlayer == plrRequestingUpdate then return end
 		local to_be_updated_chunks = {}
 		
 		for _, update in pairs(updates) do
@@ -92,7 +92,7 @@ if isClient then
 
 	--returns the updates relevant to the given chunk.
 	function replicator.GetUpdatesForChunks(chunkPositions : {Vector3}) 
-		local remote = script.Parent.Parent.Remotes.RemoteFunctions:WaitForChild('update')
+		local remote = script.Parent.Parent.Remotes.RemoteFunctions:WaitForChild("update")
 		return remote:InvokeServer(chunkPositions)
 	end
 
@@ -110,7 +110,7 @@ if isServer then
 		--Connections/remote function callback assignments
 
 		--Update log loading connection
-		script.Parent.Parent.Remotes.RemoteFunctions:WaitForChild('update').OnServerInvoke = function(_, chunkPositions : {})
+		script.Parent.Parent.Remotes.RemoteFunctions:WaitForChild("update").OnServerInvoke = function(_, chunkPositions : {})
 			local updates_to_return = {}
 			for _, pos in pairs(chunkPositions) do
 

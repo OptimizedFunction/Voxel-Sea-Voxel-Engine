@@ -32,7 +32,16 @@ local vert_chunk_size = config.GetVertChunkSize()
 local voxel_size = config.GetVoxelSize()
 
 --the main checking loop for compact and render function. [Aux function]
-function _Voxel_Combination_loop(chunk, visited_voxels : {boolean}, init_i : number, init_j : number, init_k : number, init_mat : number) : (number, number, number)
+function _Voxel_Combination_loop(
+
+	chunk, visited_voxels : {boolean},
+	init_i : number, init_j : number,
+	init_k : number, init_mat : number,
+	init_rbx_mat : Enum.Material, init_transparency : number,
+	init_color : Color3
+
+) : (number, number, number)
+
 	local voxels = chunk.Voxels
 
 	local function Get_max_i()
@@ -42,7 +51,12 @@ function _Voxel_Combination_loop(chunk, visited_voxels : {boolean}, init_i : num
 			if visited_voxels[index] then
 				return i-1
 			else
-				if Voxel.GetMaterial(voxel) == init_mat then
+				local _, mat, transparency, rbxMat, color = unpack(voxel)
+				if mat == init_mat
+				and rbxMat == init_rbx_mat
+				and transparency == init_transparency
+				and color == init_color
+				then
 					continue
 				else
 					return i-1
@@ -60,7 +74,12 @@ function _Voxel_Combination_loop(chunk, visited_voxels : {boolean}, init_i : num
 				if visited_voxels[index] then
 					return j-1
 				else
-					if Voxel.GetMaterial(voxel) == init_mat then
+					local _, mat, transparency, rbxMat, color = unpack(voxel)
+					if mat == init_mat
+					and rbxMat == init_rbx_mat
+					and transparency == init_transparency
+					and color == init_color
+					then
 						continue
 					else
 						return j-1
@@ -81,7 +100,12 @@ function _Voxel_Combination_loop(chunk, visited_voxels : {boolean}, init_i : num
 					if visited_voxels[index] then
 						return k-1
 					else
-						if Voxel.GetMaterial(voxel) == init_mat then
+						local _, mat, transparency, rbxMat, color = unpack(voxel)
+						if mat == init_mat
+						and rbxMat == init_rbx_mat
+						and transparency == init_transparency
+						and color == init_color
+						then
 							continue
 						else
 							return k-1
@@ -105,8 +129,8 @@ function Chunk.Load(chunkPositions : {Vector3})
 	local newChunks = {}
 
 	for i, chunkPosition in pairs(chunkPositions) do
-		assert(typeof(chunkPosition) == 'Vector3', '[[Voxel Sea]][Chunk.Load] Argument #1: Unexpected value type found in Vector3 array. Argument #1 must be an array containing only Vector3s.')
-		if i%3 == 0 then game:GetService('RunService').Heartbeat:Wait() end
+		assert(typeof(chunkPosition) == "Vector3", "[[Voxel Sea]][Chunk.Load] Argument #1: Unexpected value type found in Vector3 array. Argument #1 must be an array containing only Vector3s.")
+		if i%3 == 0 then game:GetService("RunService").Heartbeat:Wait() end
 
 		--not allowing this iteration to go on if the chunk for this chunkPosition already exists.
 		if Chunk.GetChunkFromPos(chunkPosition) then
@@ -117,12 +141,12 @@ function Chunk.Load(chunkPositions : {Vector3})
 		--Converting non-standard chunk position to a standard one. Standard position essentially means aligned/conforming to the grid.
 		if not (chunkPosition.X % (voxel_size*chunk_size/2) == chunkPosition.Y % (voxel_size*vert_chunk_size/2) == chunkPosition.Z % (voxel_size*chunk_size/2) == 0) then
 			if REJECT_NON_STANDARD_CHUNK_POSITIONS == true then
-				error(string.format('[[Voxel Sea]][Chunk.Load] Non-standard chunk position conversion rejected. Rejected chunk position: %s, Nearest valid position: %s', tostring(chunkPosition), tostring(Chunk.GetChunkPosFromVoxelPos(Voxel.GetNearestVoxelPos(chunkPosition)))))
+				error(string.format("[[Voxel Sea]][Chunk.Load] Non-standard chunk position conversion rejected. Rejected chunk position: %s, Nearest valid position: %s", tostring(chunkPosition), tostring(Chunk.GetChunkPosFromVoxelPos(Voxel.GetNearestVoxelPos(chunkPosition)))))
 			else
 				local newPos = Chunk.GetChunkPosFromVoxelPos(Voxel.GetNearestVoxelPos(chunkPosition))
 
 				if not newPos then
-					error(string.format('[[Voxel Sea]][Chunk.Load] Failed to convert non-standard chunk position (%s) into a standardised chunk position.', tostring(chunkPosition)))
+					error(string.format("[[Voxel Sea]][Chunk.Load] Failed to convert non-standard chunk position (%s) into a standardised chunk position.", tostring(chunkPosition)))
 				else
 					chunkPosition = newPos
 				end
@@ -134,7 +158,14 @@ function Chunk.Load(chunkPositions : {Vector3})
 
 		newChunk._IsUpdating = false
 		newChunk.Position = chunkPosition
-		newChunk.Voxels = table.create(chunk_size^2 * vert_chunk_size, 0)
+		newChunk.Voxels = table.create(chunk_size^2 * vert_chunk_size, {
+			0,
+			0,
+			0,
+			Enum.Material.Concrete,
+			Color3.new(1,1,1)
+		})
+
 		newChunk.Parts = {}
 
 		if not LoadDataCallback then
@@ -159,6 +190,7 @@ function Chunk.Load(chunkPositions : {Vector3})
 			LoadDataCallback(newChunk)
 		end
 
+
 		local loaded_chunks = replicator.LoadedChunkList
 		local x,y,z = chunkPosition.X, chunkPosition.Y, chunkPosition.Z
 
@@ -176,7 +208,7 @@ function Chunk.Load(chunkPositions : {Vector3})
 			if tonumber(index) then
 				index = tonumber(index)
 			else
-				error('[[Voxel Sea]][Chunk.Load][Chunk Update] Conversion of index to number using tonumber() failed. Index type: ' .. type(index))
+				error("[[Voxel Sea]][Chunk.Load][Chunk Update] Conversion of index to number using tonumber() failed. Index type: " .. type(index))
 			end
 			chunk.Voxels[index] = voxel_ID
 		end
@@ -243,12 +275,12 @@ function Chunk.GetChunkPosFromVoxelPos(voxel_pos : Vector3) : Vector3
 end
 
 function Chunk.GetChunkFromVoxelPos(voxel_pos : Vector3) : {} | nil
-	assert(typeof(voxel_pos) == 'Vector3', '[[Voxel Sea]][Chunk.GetChunkFromVoxelPos] Argument #1 must be a Vector3.')
+	assert(typeof(voxel_pos) == "Vector3", "[[Voxel Sea]][Chunk.GetChunkFromVoxelPos] Argument #1 must be a Vector3.")
 	return Chunk.GetChunkFromPos(Chunk.GetChunkPosFromVoxelPos(voxel_pos))
 end
 
 function Chunk.GetChunkAndVoxelIndexFromVector3(vectorPos : Vector3) : ( {} | nil, number | nil ) --returns the chunk and index of the voxel the vectorPos lies in.
-	assert(typeof(vectorPos) == 'Vector3', '[[Voxel Sea]][Chunk.GetChunkAndVoxelIndexFromVector3] Argument #1 must be a Vector3.')
+	assert(typeof(vectorPos) == "Vector3", "[[Voxel Sea]][Chunk.GetChunkAndVoxelIndexFromVector3] Argument #1 must be a Vector3.")
 
 	local voxel_pos = Voxel.GetNearestVoxelPos(vectorPos)
 	local chunk = Chunk.GetChunkFromVoxelPos(voxel_pos)
@@ -282,10 +314,10 @@ function Chunk:Unload() -- prepares chunk object for garbage collection.
 
 	local metatable = {
 		__index = function()
-			error('[[Voxel Sea]][Chunk] Attempt to access unloaded chunk!')
+			error("[[Voxel Sea]][Chunk] Attempt to access unloaded chunk!")
 		end;
 		__newindex = function()
-			error('[[Voxel Sea]][Chunk] Attempt to access unloaded chunk!')
+			error("[[Voxel Sea]][Chunk] Attempt to access unloaded chunk!")
 		end;
 	}
 
@@ -311,13 +343,14 @@ function Chunk:CompactAndRender()
 	local visited_voxels : {boolean} = table.create(chunk_size^2 * vert_chunk_size, false)
 	local part_list : {BasePart} = {}
 
-	self:_ResetVoxelStateToActive()
-
 	while true do
 		-- finding eligible initial voxel
 		initial_voxel_found = false
 		local init_i : number, init_j : number, init_k : number
 		local init_mat : number = 0
+		local init_color : Color3 = Color3.new(1,1,1)
+		local init_rbx_mat : Enum.Material = Enum.Material.SmoothPlastic
+		local init_transparency : number = 0
 
 		for index, voxel in pairs(voxels) do
 			if Voxel.GetState(voxel) and not visited_voxels[index] then
@@ -328,7 +361,7 @@ function Chunk:CompactAndRender()
 				end
 
 				init_i, init_j, init_k = Voxel.GetRelPosFromIndex(index)
-				init_mat = Voxel.GetMaterial(voxel)
+				_, init_mat, init_transparency, init_rbx_mat, init_color = unpack(voxel)
 				initial_voxel_found = true
 				break
 			end
@@ -337,11 +370,10 @@ function Chunk:CompactAndRender()
 
 		if not initial_voxel_found or not (init_i and init_j and init_k) then break end
 		--the main checking loop
-		local checked_i, checked_j, checked_k = _Voxel_Combination_loop(self, visited_voxels, init_i, init_j, init_k, init_mat)
+		local checked_i, checked_j, checked_k = _Voxel_Combination_loop(self, visited_voxels, init_i, init_j, init_k, init_mat, init_rbx_mat, init_transparency, init_color)
 
 		local init_x, init_y, init_z = utility.Relative_To_World(init_corner, init_i, init_j, init_k)
 		local final_x, final_y, final_z = utility.Relative_To_World(init_corner, checked_i, checked_j, checked_k)
-
 
 		local part_size_x = math.abs(init_x - final_x) + voxel_size
 		local part_size_y = math.abs(init_y - final_y) + voxel_size
@@ -360,7 +392,7 @@ function Chunk:CompactAndRender()
 		local voxel_part : Part
 		if #self.Parts > 0 then
 			for i = 1, #self.Parts do
-				if self.Parts[i]:GetAttribute('MaterialCode') == init_mat then
+				if self.Parts[i]:GetAttribute("MaterialCode") == init_mat then
 					voxel_part = self.Parts[i]
 					voxel_part.Position = part_pos
 					voxel_part.Size = part_size
@@ -377,7 +409,7 @@ function Chunk:CompactAndRender()
 
 				PoolService.AddTexturesToPool(voxel_part)
 
-				voxel_part:SetAttribute('MaterialCode', init_mat)
+				voxel_part:SetAttribute("MaterialCode", init_mat)
 				PoolService.AddTexturesToPart(voxel_part, init_mat)
 
 				table.remove(self.Parts, 1)
@@ -385,6 +417,12 @@ function Chunk:CompactAndRender()
 		else
 			voxel_part = PoolService.GetPart(part_pos, part_size, init_mat)
 		end
+
+        if init_mat == 4 then -- checking if primitive
+            voxel_part.Color = init_color
+            voxel_part.Material = init_rbx_mat
+            voxel_part.Transparency = init_transparency
+        end
 
 		if voxel_part.Parent ~= replicator.VoxariaObjectsFolder then
 			voxel_part.Parent = replicator.VoxariaObjectsFolder
@@ -416,16 +454,13 @@ end
 
 function Chunk:Render(scheduler, shouldYield : boolean?) -- Renders chunk. shouldYield param is optional. Defines if the
 															  -- lua thread which called this method be yielded or not.
-	if not scheduler then error('Scheduler object is required to render chunk.') end
+	if not scheduler then error("Scheduler object is required to render chunk.") end
 	scheduler:QueueTask(function() self:CompactAndRender() end, shouldYield)
 end
 
 function Chunk:Update()
-	coroutine.wrap(function()
-		repeat game:GetService('RunService').Heartbeat:Wait()
-		until not self._IsUpdating
-		self:CompactAndRender()
-	end)()
+	if self._IsUpdating then return end
+	self:CompactAndRender()
 end
 
 function Chunk:_GetNumOfAirVoxels() : number

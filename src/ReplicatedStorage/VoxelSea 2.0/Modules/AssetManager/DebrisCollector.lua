@@ -3,7 +3,7 @@ DebrisCollector.WaitingQueue = {}
 DebrisCollector.DeletionQueue = {}
 
 function removeElementFromTable(list : {}, element : any)
-    assert(typeof(list) == 'table', 'Expected type table, got type '..typeof(list)..'.')
+    assert(typeof(list) == "table", "Expected type table, got type "..typeof(list)..".")
     if not table.find(list, element) then
         return
     else
@@ -16,8 +16,8 @@ function DebrisCollector.AddItem(instance : Instance, lifetime : number)
 
     lifetime = lifetime or 0
 
-    assert(typeof(instance) == 'Instance', '[[Debris Collector]][.AddItem] Argument #1 must be of type Instance.')
-    assert(typeof(lifetime) == 'number', '[[Debris Collector]][.AddItem] Argument #2 must be of type number.')
+    assert(typeof(instance) == "Instance", "[[Debris Collector]][.AddItem] Argument #1 must be of type Instance.")
+    assert(typeof(lifetime) == "number", "[[Debris Collector]][.AddItem] Argument #2 must be of type number.")
 
     local function QueueForDeletion()
         if not instance or not table.find(DebrisCollector.WaitingQueue, instance) then

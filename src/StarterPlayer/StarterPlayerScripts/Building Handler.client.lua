@@ -10,6 +10,7 @@ local configuration = require(modules.Configuration)
 local Voxel = require(modules.VoxelLib)
 local Chunk = require(modules.Chunk)
 local utility = require(modules.Utility)
+local PrimitiveState = require(modules.PrimitiveBlockState)
 replicator.InitialiseClient()
 
 local voxariaObjFolder = replicator.VoxariaObjectsFolder
@@ -92,7 +93,7 @@ local function main_handler(action, input_state)
 					--actual block building
 					local old_ID = chunk.Voxels[index]
 
-					chunk.Voxels[index] = Voxel.GetUpdatedID(chunk.Voxels[index], false, current_mat)
+					chunk.Voxels[index] = Voxel.GetUpdatedID(chunk.Voxels[index], false, current_mat, PrimitiveState.GetTransparency(), PrimitiveState.GetRobloxMaterial(), PrimitiveState.GetColor3())
 					chunk:Update()
 					table.insert(updates, {chunk, index, old_ID, chunk.Voxels[index]})
 

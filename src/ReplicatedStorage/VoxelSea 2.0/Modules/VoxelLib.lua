@@ -11,63 +11,79 @@ local voxel_size = Configuration.GetVoxelSize()
 local Voxel = {}
 
 
-function Voxel.new(materialCode : number?)
-	assert(typeof(materialCode) == 'number' or typeof(materialCode) == nil, '[[Voxaria]][Voxel.new] Argument #1 must be either a number or nil')
+function Voxel.new(materialCode : number?, transparency : number?, rbxMaterial : Enum.Material?, color : Color3?) : {any}
+	assert(typeof(materialCode) == "number" or typeof(materialCode) == nil, "[[Voxaria]][Voxel.new] Argument #1 must be either a number or nil")
 	materialCode = materialCode or 0
+	transparency = transparency or 0
+	rbxMaterial = rbxMaterial or Enum.Material.Concrete
+	color = color or Color3.new(1,1,1)
 
-	local newVoxel = materialCode::number * 10
-	return newVoxel
+
+	return {
+		1,
+		materialCode,
+		transparency,
+		rbxMaterial,
+		color
+	}
 end
 
 
-function Voxel.GetState(voxelID : number) : boolean
-	assert(typeof(voxelID) == 'number', '[[Voxaria]][Voxel.GetState] Argument #1 must be a number.')
-	if voxelID%10 == 0 then return false
-	else return true
-	end
+function Voxel.GetState(voxelID : {any}) : boolean
+	assert(typeof(voxelID) == "table", "[[Voxaria]][Voxel.GetState] Argument #1 must be a table.")
+	return if voxelID[1] == 1 then true else false
 end
 
-function Voxel.GetOccupationState(voxelID : number) : boolean
-	assert(typeof(voxelID) == 'number', '[[Voxaria]][Voxel.GetOccupationState] Argument #1 must be a number.')
+function Voxel.GetOccupationState(voxelID : {any}) : boolean
+	assert(typeof(voxelID) == "number", "[[Voxaria]][Voxel.GetOccupationState] Argument #1 must be a number.")
 end
 
-function Voxel.GetMaterial(voxelID : number) : number
-	assert(typeof(voxelID) == 'number', '[[Voxaria]][Voxel.GetMaterial] Argument #1 must be a number.'..typeof(voxelID))
-	return math.floor(voxelID/10)
+function Voxel.GetMaterial(voxelID : {any}) : number
+	assert(typeof(voxelID) == "table", "[[Voxaria]][Voxel.GetMaterial] Argument #1 must be a table."..typeof(voxelID))
+	return voxelID[2]
 end
 
+function Voxel.GetTransparency(voxelID : {any}) : number
+	return voxelID[3]
+end
 
-function Voxel.GetUpdatedID(voxelID : number, state : boolean?, mat : number?) : number
-	assert(typeof(voxelID) == 'number', '[[Voxaria]][Voxel.GetUpdatedID] Argument #1 must be a number.'..typeof(voxelID))
-	assert(typeof(state) == 'boolean' or typeof(state) == 'nil', '[[Voxaria]][Voxel.GetUpdatedID] Argument #2 must be either a bool or nil.')
-	assert(typeof(mat) == 'number' or typeof(mat) == 'nil', '[[Voxaria]][Voxel.GetUpdatedID] Argument #3 must be either a number or nil.')
+function Voxel.GetRbxMaterial(voxelID : {any}) : Enum.Material
+	return voxelID[4]
+end
 
-	local stateNum : number
-	state = state or Voxel.GetState(voxelID)
+function Voxel.GetColor(voxelID : {any}) : Color3
+	return voxelID[5]
+end
 
-	if state == true then
-		stateNum = 1
-	elseif state == false then
-		stateNum = 0
-	end
+function Voxel.GetUpdatedID(voxelID : string, state : boolean?, mat : number?, transparency : number?, rbxMaterial : Enum.Material?, color : Color3?) : {any}
+	assert(typeof(voxelID) == "table", "[[Voxaria]][Voxel.GetUpdatedID] Argument #1 must be a table. "..typeof(voxelID))
+	assert(typeof(state) == "boolean" or typeof(state) == "nil", "[[Voxaria]][Voxel.GetUpdatedID] Argument #2 must be either a bool or nil.")
+	assert(typeof(mat) == "number" or typeof(mat) == "nil", "[[Voxaria]][Voxel.GetUpdatedID] Argument #3 must be either a number or nil.")
 
-	if mat then
-		return mat*10 + stateNum
-	else 
-		return Voxel.GetMaterial(voxelID)*10 + stateNum
-	end
+	mat = mat or voxelID[2]
+	transparency = transparency or voxelID[3]
+	rbxMaterial = rbxMaterial or voxelID[4]
+	color = color or voxelID[5]
+
+	return {
+		1,
+		mat,
+		transparency,
+		rbxMaterial,
+		color
+	}
 end
 
 function Voxel.GetIndex(i : number, j : number, k : number) : number
-	assert(typeof(i) == 'number', '[[Voxaria]][Voxel.GetIndex] Argument #1 must be a number.')
-	assert(typeof(j) == 'number', '[[Voxaria]][Voxel.GetIndex] Argument #2 must be a number.')
-	assert(typeof(k) == 'number', '[[Voxaria]][Voxel.GetIndex] Argument #3 must be a number.')
+	assert(typeof(i) == "number", "[[Voxaria]][Voxel.GetIndex] Argument #1 must be a number.")
+	assert(typeof(j) == "number", "[[Voxaria]][Voxel.GetIndex] Argument #2 must be a number.")
+	assert(typeof(k) == "number", "[[Voxaria]][Voxel.GetIndex] Argument #3 must be a number.")
 
 	return (chunk_size * vert_chunk_size * (k-1)) + (chunk_size * (j-1)) + i
 end
 
 function Voxel.GetRelPosFromIndex(index : number) : (number, number, number)
-	assert(typeof(index) == 'number', '[[Voxaria]][Voxel.GetRelPosFromIndex] Argument #1 must be a number.')
+	assert(typeof(index) == "number", "[[Voxaria]][Voxel.GetRelPosFromIndex] Argument #1 must be a number.")
 
 	local i = index%chunk_size
 	local k = math.floor(index/(chunk_size*vert_chunk_size)) + 1
@@ -88,7 +104,7 @@ end
 
 
 function Voxel.GetNearestVoxelPos(vectorPos : Vector3) : Vector3
-	assert(typeof(vectorPos) == 'Vector3', '[[Voxaria]][Voxel.GetNearestVoxelPos] Argument #1 must be a Vector3.')
+	assert(typeof(vectorPos) == "Vector3", "[[Voxaria]][Voxel.GetNearestVoxelPos] Argument #1 must be a Vector3.")
 
 	local x,y,z = CFrame.new(vectorPos + Vector3.new(1,1,1) * math.pi/100):GetComponents()
 
@@ -122,9 +138,9 @@ function Voxel.GetVoxelsInCuboid(position : Vector3, size : Vector3) : {{{any} |
 				local ChunkClass = require(modules.Chunk)
 				local chunk, index = ChunkClass.GetChunkAndVoxelIndexFromVector3(Vector3.new(x,y,z))
 				
-				assert(chunk and index, '[[Voxaria]][GetVoxelsInCuboid] GetChunkAndVoxelIndexFromVector3() experienced an error. chunk and index not found.')
-				assert(chunk, '[[Voxaria]][GetVoxelsInCuboid] GetChunkAndVoxelIndexFromVector3() experienced an error. chunk not found.')
-				assert(index, '[[Voxaria]][GetVoxelsInCuboid] GetChunkAndVoxelIndexFromVector3() experienced an error. index not found.')
+				assert(chunk and index, "[[Voxaria]][GetVoxelsInCuboid] GetChunkAndVoxelIndexFromVector3() experienced an error. chunk and index not found.")
+				assert(chunk, "[[Voxaria]][GetVoxelsInCuboid] GetChunkAndVoxelIndexFromVector3() experienced an error. chunk not found.")
+				assert(index, "[[Voxaria]][GetVoxelsInCuboid] GetChunkAndVoxelIndexFromVector3() experienced an error. index not found.")
 
 				table.insert(voxelsInCuboid, {chunk, index})
 			end
@@ -153,7 +169,3 @@ function Voxel.GetVoxelsInSphere(center : Vector3, radius : number) : {{{any} | 
 end
 
 return Voxel
-
-
-
-

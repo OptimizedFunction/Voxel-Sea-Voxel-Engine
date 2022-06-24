@@ -1,13 +1,14 @@
 --!nocheck
 local buttons = {
-	
+
 	script.Parent.Grass,
 	script.Parent.Dirt,
-	script.Parent.Stone
-	
+	script.Parent.Stone,
+	script.Parent.Primitive
+
 }
 
-function updateMat(action, inputState, inputObj)
+function updateMat(action, inputState)
 	if inputState == Enum.UserInputState.End then return end
 
 	local i = table.find(buttons, script.Parent[action])
@@ -38,9 +39,10 @@ for i = 1, #buttons do
 end
 
 
-local CAS : ContextActionService = game:GetService('ContextActionService')
-CAS:BindAction('Grass', updateMat, false, Enum.KeyCode.One)
-CAS:BindAction('Dirt', updateMat, false, Enum.KeyCode.Two)
-CAS:BindAction('Stone', updateMat, false, Enum.KeyCode.Three)
+local CAS : ContextActionService = game:GetService("ContextActionService")
+CAS:BindAction("Grass", updateMat, false, Enum.KeyCode.One)
+CAS:BindAction("Dirt", updateMat, false, Enum.KeyCode.Two)
+CAS:BindAction("Stone", updateMat, false, Enum.KeyCode.Three)
+CAS:BindAction("Primitive", updateMat, false, Enum.KeyCode.Four)
 
 
