@@ -37,7 +37,9 @@ function _Voxel_Combination_loop(
 	chunk, visited_voxels : {boolean},
 	init_i : number, init_j : number,
 	init_k : number, init_mat : number,
-	init_rbx_mat : Enum.Material, init_transparency : number,
+	init_rbx_mat : Enum.Material,
+	init_transparency : number,
+	init_reflectance : number,
 	init_color : Color3
 
 ) : (number, number, number)
@@ -51,10 +53,11 @@ function _Voxel_Combination_loop(
 			if visited_voxels[index] then
 				return i-1
 			else
-				local _, mat, transparency, rbxMat, color = unpack(voxel)
+				local _, mat, transparency, reflectance, rbxMat, color = unpack(voxel)
 				if mat == init_mat
 				and rbxMat == init_rbx_mat
 				and transparency == init_transparency
+				and reflectance == init_reflectance
 				and color == init_color
 				then
 					continue
@@ -74,10 +77,11 @@ function _Voxel_Combination_loop(
 				if visited_voxels[index] then
 					return j-1
 				else
-					local _, mat, transparency, rbxMat, color = unpack(voxel)
+					local _, mat, transparency, reflectance, rbxMat, color = unpack(voxel)
 					if mat == init_mat
 					and rbxMat == init_rbx_mat
 					and transparency == init_transparency
+					and reflectance == init_reflectance
 					and color == init_color
 					then
 						continue
@@ -100,12 +104,13 @@ function _Voxel_Combination_loop(
 					if visited_voxels[index] then
 						return k-1
 					else
-						local _, mat, transparency, rbxMat, color = unpack(voxel)
+						local _, mat, transparency, reflectance, rbxMat, color = unpack(voxel)
 						if mat == init_mat
 						and rbxMat == init_rbx_mat
 						and transparency == init_transparency
+						and reflectance == init_reflectance
 						and color == init_color
-						then
+						then 
 							continue
 						else
 							return k-1
@@ -159,6 +164,7 @@ function Chunk.Load(chunkPositions : {Vector3})
 		newChunk._IsUpdating = false
 		newChunk.Position = chunkPosition
 		newChunk.Voxels = table.create(chunk_size^2 * vert_chunk_size, {
+			0,
 			0,
 			0,
 			0,
@@ -350,7 +356,7 @@ function Chunk:CompactAndRender()
 		local init_mat : number = 0
 		local init_color : Color3 = Color3.new(1,1,1)
 		local init_rbx_mat : Enum.Material = Enum.Material.SmoothPlastic
-		local init_transparency : number = 0
+		local init_transparency, init_reflectance : number = 0, 0
 
 		for index, voxel in pairs(voxels) do
 			if Voxel.GetState(voxel) and not visited_voxels[index] then
@@ -359,9 +365,10 @@ function Chunk:CompactAndRender()
 				if Voxel.GetMaterial(voxel) == 0 then
 					continue
 				end
-
+				
+				local _
 				init_i, init_j, init_k = Voxel.GetRelPosFromIndex(index)
-				_, init_mat, init_transparency, init_rbx_mat, init_color = unpack(voxel)
+				_, init_mat, init_transparency, init_reflectance, init_rbx_mat, init_color = unpack(voxel)
 				initial_voxel_found = true
 				break
 			end
@@ -370,7 +377,7 @@ function Chunk:CompactAndRender()
 
 		if not initial_voxel_found or not (init_i and init_j and init_k) then break end
 		--the main checking loop
-		local checked_i, checked_j, checked_k = _Voxel_Combination_loop(self, visited_voxels, init_i, init_j, init_k, init_mat, init_rbx_mat, init_transparency, init_color)
+		local checked_i, checked_j, checked_k = _Voxel_Combination_loop(self, visited_voxels, init_i, init_j, init_k, init_mat, init_rbx_mat, init_transparency, init_reflectance, init_color)
 
 		local init_x, init_y, init_z = utility.Relative_To_World(init_corner, init_i, init_j, init_k)
 		local final_x, final_y, final_z = utility.Relative_To_World(init_corner, checked_i, checked_j, checked_k)
@@ -422,6 +429,7 @@ function Chunk:CompactAndRender()
             voxel_part.Color = init_color
             voxel_part.Material = init_rbx_mat
             voxel_part.Transparency = init_transparency
+			voxel_part.Reflectance = init_reflectance
         end
 
 		if voxel_part.Parent ~= replicator.VoxariaObjectsFolder then

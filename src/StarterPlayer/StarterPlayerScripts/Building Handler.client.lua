@@ -1,9 +1,9 @@
 --!nocheck
-local plr : Player = game:GetService('Players').LocalPlayer
-local CAS : ContextActionService = game:GetService('ContextActionService')
-local UIS : UserInputService = game:GetService('UserInputService')
-local RunService : RunService = game:GetService('RunService')
-local modules = require(game:GetService('ReplicatedStorage')["VoxelSea 2.0"].Modules.ModuleIndex)
+local plr : Player = game:GetService("Players").LocalPlayer
+local CAS : ContextActionService = game:GetService("ContextActionService")
+local UIS : UserInputService = game:GetService("UserInputService")
+local RunService : RunService = game:GetService("RunService")
+local modules = require(game:GetService("ReplicatedStorage")["VoxelSea 2.0"].Modules.ModuleIndex)
 
 local replicator = require(modules.ReplicatorAndUpdateLogger)
 local configuration = require(modules.Configuration)
@@ -34,7 +34,7 @@ local function main_handler(action, input_state)
 	if buildingCooldown then return end
 	buildingCooldown = true
 
-	if action == 'Destroy' then
+	if action == "Destroy" then
 		break_loop = false
 		repeat
 			local chunk, index = Chunk.GetChunkAndVoxelIndexFromVector3(currentPos)
@@ -48,7 +48,7 @@ local function main_handler(action, input_state)
 			task.wait(cooldown)
 		until break_loop
 		
-	elseif action == 'Build' then
+	elseif action == "Build" then
 		break_loop = false
 		local current_mat = plr.PlayerGui.Hotbar.CurrentMat.Value
 		if current_mat == 0 then break_loop = true; buildingCooldown = false; return end
@@ -63,8 +63,8 @@ local function main_handler(action, input_state)
 			
 			local results = workspace:Raycast(unitRay.Origin, unitRay.Direction * range, params)
 			
-			if results and results.Instance:IsA('BasePart') and results.Instance.Parent == voxariaObjFolder then
-				--making sure the voxel can be found by taking the position closer to the voxel's position.
+			if results and results.Instance:IsA("BasePart") and results.Instance.Parent == voxariaObjFolder then
+				--making sure the voxel can be found by taking the position closer to the voxel"s position.
 				local hitPos = results.Position + results.Normal * voxel_size/2
 				
 				local chunk, index = Chunk.GetChunkAndVoxelIndexFromVector3(hitPos)
@@ -93,7 +93,7 @@ local function main_handler(action, input_state)
 					--actual block building
 					local old_ID = chunk.Voxels[index]
 
-					chunk.Voxels[index] = Voxel.GetUpdatedID(chunk.Voxels[index], false, current_mat, PrimitiveState.GetTransparency(), PrimitiveState.GetRobloxMaterial(), PrimitiveState.GetColor3())
+					chunk.Voxels[index] = Voxel.GetUpdatedID(chunk.Voxels[index], false, current_mat, PrimitiveState.GetTransparency(), PrimitiveState.GetReflectance(), PrimitiveState.GetRobloxMaterial(), PrimitiveState.GetColor3())
 					chunk:Update()
 					table.insert(updates, {chunk, index, old_ID, chunk.Voxels[index]})
 
@@ -109,31 +109,31 @@ local function main_handler(action, input_state)
 end
 
 
-CAS:BindAction('Destroy', main_handler, false, Enum.KeyCode.R)
-CAS:BindAction('Build', main_handler, false, Enum.UserInputType.MouseButton1)
+CAS:BindAction("Destroy", main_handler, false, Enum.KeyCode.R)
+CAS:BindAction("Build", main_handler, false, Enum.UserInputType.MouseButton1)
 
 function updateBrush(position : Vector3)
     local brush : Part
-    if currentBrush and (currentBrush:FindFirstChild('SelectionBox')) then
+    if currentBrush and (currentBrush:FindFirstChild("SelectionBox")) then
         brush = currentBrush
 		currentPos = position
         brush.Position = position
 
-        local selectionInstance = currentBrush:FindFirstChild('SelectionBox')
+        local selectionInstance = currentBrush:FindFirstChild("SelectionBox")
         selectionInstance.Color3 = Color3.new(0, 0, 0)
     else
-        brush = Instance.new('Part')
+        brush = Instance.new("Part")
 		brush.CanCollide = false
 	    brush.Transparency = 1
 		currentPos = position
         brush.Position = position
-        brush.Name = '[VoxelSea] BoundingPart'
+        brush.Name = "[VoxelSea] BoundingPart"
         brush.Locked = true
 		brush.Anchored = true
         brush.Parent = workspace
         brush.Size = Vector3.new(1.1, 1.1, 1.1) * voxel_size
 
-        local SelectionBox = Instance.new('SelectionBox')
+        local SelectionBox = Instance.new("SelectionBox")
         SelectionBox.SurfaceTransparency = 1
 		SelectionBox.Transparency = 0.5
 		SelectionBox.Color3 = Color3.new(0, 0, 0)
@@ -159,7 +159,7 @@ RunService:BindToRenderStep(
 		local results = workspace:Raycast(unitRay.Origin, unitRay.Direction * range, params)
 
 
-		if results and results.Instance:IsA('BasePart') then
+		if results and results.Instance:IsA("BasePart") then
 			local hitPos : Vector3 = results.Position - results.Normal * voxel_size/2
 			local x,y,z = CFrame.new(hitPos):GetComponents()
 

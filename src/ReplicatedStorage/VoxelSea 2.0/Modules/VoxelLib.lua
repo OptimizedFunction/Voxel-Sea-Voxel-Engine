@@ -11,10 +11,11 @@ local voxel_size = Configuration.GetVoxelSize()
 local Voxel = {}
 
 
-function Voxel.new(materialCode : number?, transparency : number?, rbxMaterial : Enum.Material?, color : Color3?) : {any}
+function Voxel.new(materialCode : number?, transparency : number?, reflectance : number?, rbxMaterial : Enum.Material?, color : Color3?) : {any}
 	assert(typeof(materialCode) == "number" or typeof(materialCode) == nil, "[[Voxaria]][Voxel.new] Argument #1 must be either a number or nil")
 	materialCode = materialCode or 0
 	transparency = transparency or 0
+	reflectance = reflectance or 0
 	rbxMaterial = rbxMaterial or Enum.Material.Concrete
 	color = color or Color3.new(1,1,1)
 
@@ -23,6 +24,7 @@ function Voxel.new(materialCode : number?, transparency : number?, rbxMaterial :
 		1,
 		materialCode,
 		transparency,
+		reflectance,
 		rbxMaterial,
 		color
 	}
@@ -47,27 +49,33 @@ function Voxel.GetTransparency(voxelID : {any}) : number
 	return voxelID[3]
 end
 
-function Voxel.GetRbxMaterial(voxelID : {any}) : Enum.Material
+function Voxel.GetReflectance(voxelID : {any}) : number
 	return voxelID[4]
 end
 
-function Voxel.GetColor(voxelID : {any}) : Color3
+function Voxel.GetRbxMaterial(voxelID : {any}) : Enum.Material
 	return voxelID[5]
 end
 
-function Voxel.GetUpdatedID(voxelID : string, state : boolean?, mat : number?, transparency : number?, rbxMaterial : Enum.Material?, color : Color3?) : {any}
+function Voxel.GetColor(voxelID : {any}) : Color3
+	return voxelID[6]
+end
+
+function Voxel.GetUpdatedID(voxelID : string, state : boolean?, mat : number?, transparency : number?, reflectance : number?, rbxMaterial : Enum.Material?, color : Color3?) : {any}
 	assert(typeof(voxelID) == "table", "[[Voxaria]][Voxel.GetUpdatedID] Argument #1 must be a table. "..typeof(voxelID))
 	assert(typeof(state) == "boolean" or typeof(state) == "nil", "[[Voxaria]][Voxel.GetUpdatedID] Argument #2 must be either a bool or nil.")
 	assert(typeof(mat) == "number" or typeof(mat) == "nil", "[[Voxaria]][Voxel.GetUpdatedID] Argument #3 must be either a number or nil.")
 
 	mat = mat or voxelID[2]
 	transparency = transparency or voxelID[3]
-	rbxMaterial = rbxMaterial or voxelID[4]
-	color = color or voxelID[5]
+	reflectance = reflectance or voxelID[4]
+	rbxMaterial = rbxMaterial or voxelID[5]
+	color = color or voxelID[6]
 
 	return {
 		1,
 		mat,
+		reflectance,
 		transparency,
 		rbxMaterial,
 		color
