@@ -311,8 +311,6 @@ function Chunk:CompactAndRender()
 	local visited_voxels : {boolean} = table.create(chunk_size^2 * vert_chunk_size, false)
 	local part_list : {BasePart} = {}
 
-	self:_ResetVoxelStateToActive()
-
 	while true do
 		-- finding eligible initial voxel
 		initial_voxel_found = false

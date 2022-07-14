@@ -15,7 +15,7 @@ function Voxel.new(materialCode : number?)
 	assert(typeof(materialCode) == 'number' or typeof(materialCode) == nil, '[[Voxaria]][Voxel.new] Argument #1 must be either a number or nil')
 	materialCode = materialCode or 0
 
-	local newVoxel = materialCode::number * 10
+	local newVoxel = materialCode::number * 10 + 1
 	return newVoxel
 end
 
