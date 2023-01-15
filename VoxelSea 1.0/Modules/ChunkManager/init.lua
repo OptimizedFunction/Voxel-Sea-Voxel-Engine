@@ -7,12 +7,16 @@ local Voxel = require(modules.VoxelLib)
 local assetManager = require(modules.AssetManager)
 local utility = require(modules.Utility)
 
-
 local chunk_size = config.GetChunkSize()
 local vert_chunk_size = config.GetVertChunkSize()
 local voxel_size = config.GetVoxelSize()
 
 local seed : number = math.random() * 10
+
+local actorFolder = Instance.new("Folder")
+actorFolder.Parent = game:GetService("Players").LocalPlayer.PlayerScripts
+script.Script.Parent = script.Template
+script.Template.Parent = actorFolder
 
 local mat_info = assetManager.Material_Info
 local materials = {}
@@ -34,7 +38,7 @@ function chunk_manager.UpdateChunkWithTerrainData(chunk)
 		
 		for index = 1, NUMBER_OF_ACTORS do
 			
-			local actor = script:FindFirstChild("Actor"..index) or script.Template:Clone()
+			local actor = actorFolder:FindFirstChild("Actor"..index) or actorFolder.Template:Clone()
 			actor.Name = "Actor"..index
 			actor:SetAttribute("chunk_size", chunk_size)
 			actor:SetAttribute("vert_chunk_size", vert_chunk_size)
@@ -57,7 +61,7 @@ function chunk_manager.UpdateChunkWithTerrainData(chunk)
 				conn:Disconnect()
 			end)
 			
-			actor.Parent = script
+			actor.Parent = actorFolder
 			actor.Script.Enabled = true
 		end
 		repeat task.wait() 
