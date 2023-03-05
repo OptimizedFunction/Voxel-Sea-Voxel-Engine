@@ -1,0 +1,10 @@
+{
+    "ClassName": "Actor",
+    "Name": "Template",
+    "Children": [
+      {
+        "Name": "ComputationCompleted",
+        "ClassName": "BindableEvent"
+      }
+    ]
+  }
